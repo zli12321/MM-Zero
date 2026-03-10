@@ -12,7 +12,7 @@
 MM-Zero is a **self-play reinforcement learning framework** that improves vision-language models (VLMs) without requiring any human-annotated image data. It co-evolves three specialized agents — **Proposer**, **CodeGen**, and **Solver** — in an iterative loop where each agent bootstraps training signal for the others.
 
 <p align="center">
-  <img src="Qwen3-VL-8B-Instruct-5-Iters.png" width="100%" alt="Co-evolution metrics across 5 self-play iterations on Qwen3-VL-8B-Instruct">
+  <img src="/assets/case_study.pdf" width="100%" alt="Co-evolution metrics across 5 self-play iterations on Qwen3-VL-8B-Instruct">
 </p>
 
 ## How It Works
