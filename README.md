@@ -32,7 +32,7 @@ Built on [EasyR1](https://github.com/hiyouga/EasyR1) / [veRL](https://github.com
 **1. Create a conda environment**
 
 ```bash
-conda create -n mm-zero python=3.12 -y
+conda create -n mm-zero python=3.12
 conda activate mm-zero
 ```
 
@@ -58,7 +58,11 @@ bash setup.sh
 Launch the full self-play pipeline with a single command:
 
 ```bash
-bash MM-zero_final/scripts/main_svg.sh
+## Qwen3-VL-8B-Instruct
+bash ./scripts/main_svg.sh
+
+## Qwen3-VL-4B-Instruct
+bash ./scripts/main_qwen3vl_4b.sh
 ```
 
 This runs the complete iterative loop (Proposer → CodeGen → Solver) for multiple iterations, starting from a base model. Each iteration builds on the previous one's checkpoints.
