@@ -99,8 +99,8 @@ The pipeline is **resumable** — it automatically detects existing checkpoints 
 | Script | Description |
 |---|---|
 | `MM-zero_final/scripts/main_svg.sh` | Full VLM self-evolving pipeline for Qwen3-VL-8B |
-| `MM-zero_final/scripts/main_qwen3vl_4b.sh` | Full VLM self-play pipeline for Qwen3-VL-4B |
-| `MM-zero_final/scripts/main_svg_mino.sh` | Full VLM self-play pipeline for Mimo-VL-7B-SFT |
+| `MM-zero_final/scripts/main_qwen3vl_4b.sh` | Full VLM self-evolving pipeline for Qwen3-VL-4B |
+| `MM-zero_final/scripts/main_svg_mino.sh` | Full VLM self-evolving pipeline for Mimo-VL-7B-SFT |
 | `MM-zero_final/scripts/proposer_train.sh` | Proposer-only training |
 | `MM-zero_final/scripts/codegen_train.sh` | CodeGen-only training |
 | `MM-zero_final/scripts/solver_train.sh` | Solver-only training |
