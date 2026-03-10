@@ -1,5 +1,9 @@
 # MM-Zero: Multimodal Self-Play for Vision-Language Models
-[![Temporary Paper Link](https://img.shields.io/badge/Paper-arXiv-b31b1b.svg)](https://www.researchgate.net/publication/401388352_Multimodal_Video_Generation_Models_with_Audio_Present_and_Future)
+
+<p align="center">
+  <a href="https://www.researchgate.net/publication/401388352_Multimodal_Video_Generation_Models_with_Audio_Present_and_Future"><img src="https://img.shields.io/badge/Paper-arXiv-b31b1b.svg" alt="Paper"></a>
+</p>
+
 <p align="center">
   <a href="#installation">Installation</a> •
   <a href="#training">Training</a> •
