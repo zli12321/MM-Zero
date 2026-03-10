@@ -13,7 +13,7 @@
   <a href="#citation">Citation</a>
 </p>
 
-MM-Zero is a **self-play reinforcement learning framework** that improves vision-language models (VLMs) without requiring any human-annotated image data. It co-evolves three specialized agents — **Proposer**, **CodeGen**, and **Solver** — in an iterative loop where each agent bootstraps training signal for the others.
+MM-Zero is a **self-evolving reinforcement learning framework** that improves vision-language models (VLMs) without requiring any human-annotated image data. It co-evolves three specialized agents — **Proposer**, **CodeGen**, and **Solver** — in an iterative loop where each agent bootstraps training signal for the others.
 
 <p align="center">
   <img src="assets/case_study.png" width="100%" alt="Case study examples">
