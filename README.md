@@ -12,7 +12,7 @@
 MM-Zero is a **self-play reinforcement learning framework** that improves vision-language models (VLMs) without requiring any human-annotated image data. It co-evolves three specialized agents — **Proposer**, **CodeGen**, and **Solver** — in an iterative loop where each agent bootstraps training signal for the others.
 
 <p align="center">
-  <img src="/assets/case_study.pdf" width="100%" alt="Co-evolution metrics across 5 self-play iterations on Qwen3-VL-8B-Instruct">
+  <img src="assets/case_study.png" width="100%" alt="Case study examples">
 </p>
 
 ## How It Works
@@ -40,7 +40,7 @@ conda activate mm-zero
 
 ```bash
 git clone https://github.com/zli12321/MM-Zero.git
-cd Self-Agent
+cd MM-Zero
 bash setup.sh
 ```
 
@@ -177,4 +177,3 @@ This project is released under the [Apache 2.0 License](LICENSE).
 
 - [EasyR1](https://github.com/hiyouga/EasyR1) and [veRL](https://github.com/volcengine/verl) for the RL training framework
 - [vLLM](https://github.com/vllm-project/vllm) for efficient inference
-# MM-Zero
