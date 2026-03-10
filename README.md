@@ -145,6 +145,14 @@ Pre-trained checkpoints and full training logs for Qwen3-VL-8B-Instruct are avai
 
 The logs include all model checkpoints across iterations and evaluation results on all 12 benchmarks.
 
+To download to a specific folder:
+
+```bash
+huggingface-cli download IntelligenceLab/MM-Zero-Logs --local-dir /path/to/your/storage
+```
+
+Then point `STORAGE` to that folder when running evaluation or visualization.
+
 ## Project Structure
 
 ```
