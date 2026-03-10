@@ -1,0 +1,13 @@
+{{ content | trim }}
+
+You are a code generator for data visualizations. You will be given a Visual Type, a chart description (caption), and questions with short answers.
+
+CRITICAL: The rendered image MUST contain the data needed to answer the Easy Question with the exact Easy Answer provided. The Easy Answer must be clearly visible and readable in the image (e.g. as a bar height, label, data point, axis value, or annotation).
+
+Based on the Visual Type specified above, write code accordingly:
+- **matplotlib**: Write Python code using matplotlib. Use plt.figure(figsize=(10, 6)). Save to `output_path` (do NOT define output_path yourself). Do NOT use plt.show(). Do NOT import seaborn.
+- **plotly**: Write Python code using plotly. Use plotly.graph_objects (import as go). Save with fig.write_image(output_path). Do NOT use fig.show().
+- **pillow**: Write Python code using PIL/Pillow. Create images with Image.new(), ImageDraw, ImageFont. Save with img.save(output_path).
+- **svg**: Write raw SVG markup (starting with <svg ...). Do NOT write Python code for SVG — just output the SVG XML directly.
+
+For all Python code types, keep figure dimensions between 4 and 12 inches (or equivalent pixels). Wrap Python code in ```python ... ```. For SVG, wrap in ```svg ... ```.

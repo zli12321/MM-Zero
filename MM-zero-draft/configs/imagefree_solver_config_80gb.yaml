@@ -1,0 +1,114 @@
+# ImageFree Self-Play: Solver Training Config — 80GB GPUs
+
+data:
+  train_files: ""
+  val_files: yourpath/datasets/mmstar/test.parquet
+  prompt_key: problem
+  answer_key: answer
+  image_key: images
+  video_key: videos
+  image_dir: null
+  video_fps: 2.0
+  max_prompt_length: 8192
+  max_response_length: 4096
+  rollout_batch_size: 512
+  mini_rollout_batch_size: null
+  val_batch_size: 1024
+  format_prompt: ./SelfAgent/format_prompt/solver.jinja
+  override_chat_template: null
+  shuffle: true
+  seed: 1
+  min_pixels: 262144
+  max_pixels: 4194304
+  filter_overlong_prompts: true
+
+algorithm:
+  adv_estimator: grpo
+  disable_kl: false
+  use_kl_loss: true
+  kl_penalty: low_var_kl
+  kl_coef: 1.0e-2
+  online_filtering: false
+  filter_key: overall
+  filter_low: 0.01
+  filter_high: 0.99
+
+worker:
+  actor:
+    global_batch_size: 128
+    micro_batch_size_per_device_for_update: 1
+    micro_batch_size_per_device_for_experience: 1
+    max_grad_norm: 1.0
+    padding_free: true
+    dynamic_batching: true
+    ulysses_size: 1
+    model:
+      model_path: Qwen/Qwen2.5-VL-3B-Instruct
+      enable_gradient_checkpointing: true
+      trust_remote_code: false
+      freeze_vision_tower: false
+      lora:
+        rank: 0
+        alpha: 64
+        target_modules: all-linear
+        exclude_modules: .*visual.*
+    optim:
+      lr: 1.0e-6
+      weight_decay: 1.0e-2
+      strategy: adamw
+      lr_warmup_ratio: 0.0
+    fsdp:
+      enable_full_shard: true
+      enable_cpu_offload: false
+      enable_rank0_init: true
+    offload:
+      offload_params: true
+      offload_optimizer: true
+
+  rollout:
+    n: 8
+    temperature: 1.0
+    top_p: 0.99
+    limit_images: 0
+    gpu_memory_utilization: 0.8
+    max_model_len: null   # 80GB: use model default
+    max_num_batched_tokens: 16384  # must be > max_prompt_length + max_response_length (8192+4096)
+    enforce_eager: false
+    enable_chunked_prefill: false
+    tensor_parallel_size: 2
+    disable_tqdm: false
+    val_override_config:
+      temperature: 0.6
+      top_p: 0.95
+      n: 1
+
+  ref:
+    fsdp:
+      enable_full_shard: true
+      enable_cpu_offload: true
+      enable_rank0_init: true
+    offload:
+      offload_params: false
+
+  reward:
+    reward_function: ./SelfAgent/reward_function/cot_val_solver.py:compute_score
+
+trainer:
+  total_epochs: 10
+  max_steps: 20
+  project_name: easy_r1
+  experiment_name: imagefree_solver
+  logger: ["file", "wandb"]
+  nnodes: 1
+  n_gpus_per_node: 8
+  max_try_make_batch: 20
+  val_freq: 5
+  val_before_train: false
+  val_only: false
+  val_generations_to_log: 3
+  save_freq: 20
+  save_limit: -1
+  save_model_only: false
+  save_checkpoint_path: null
+  load_checkpoint_path: null
+  find_last_checkpoint: true

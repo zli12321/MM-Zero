@@ -1,0 +1,115 @@
+# ImageFree Self-Play: Code Generator Training Config (EasyR1)
+# The CodeGen model is text-only — takes caption + questions, outputs matplotlib code.
+# Reward involves rendering code and querying the Solver vLLM service.
+
+data:
+  # Override via CLI: data.train_files=${STORAGE_PATH}/generated_proposals/${save_path}_proposals.parquet
+  train_files: ""
+  val_files: yourpath/datasets/mmstar/test.parquet
+  prompt_key: prompt_text
+  answer_key: easy_answer
+  image_key: images  # not used — CodeGen is text-only
+  video_key: videos
+  image_dir: null
+  video_fps: 2.0
+  max_prompt_length: 4096
+  max_response_length: 4096  # Code can be longer than natural language
+  rollout_batch_size: 256  # Smaller batch — code rendering is expensive
+  mini_rollout_batch_size: null
+  val_batch_size: 512
+  format_prompt: ./SelfAgent_svg/format_prompt/codegen.jinja
+  override_chat_template: null
+  shuffle: true
+  seed: 1
+  min_pixels: 262144
+  max_pixels: 4194304
+  filter_overlong_prompts: true
+
+algorithm:
+  adv_estimator: grpo
+  disable_kl: false
+  use_kl_loss: true
+  kl_penalty: low_var_kl
+  kl_coef: 1.0e-2
+  online_filtering: false
+  filter_key: overall
+  filter_low: 0.01
+  filter_high: 0.99
+
+worker:
+  actor:
+    global_batch_size: 64  # Smaller — codegen reward is expensive (involves subprocess calls)
+    micro_batch_size_per_device_for_update: 1
+    micro_batch_size_per_device_for_experience: 4
+    max_grad_norm: 1.0
+    padding_free: true
+    dynamic_batching: true
+    ulysses_size: 1
+    model:
+      model_path: Qwen/Qwen2.5-VL-3B-Instruct
+      enable_gradient_checkpointing: true
+      trust_remote_code: false
+      freeze_vision_tower: false
+      lora:
+        rank: 0
+        alpha: 64
+        target_modules: all-linear
+        exclude_modules: .*visual.*
+    optim:
+      lr: 1.0e-6
+      weight_decay: 1.0e-2
+      strategy: adamw
+      lr_warmup_ratio: 0.0
+    fsdp:
+      enable_full_shard: true
+      enable_cpu_offload: false
+      enable_rank0_init: true
+    offload:
+      offload_params: true
+      offload_optimizer: true
+
+  rollout:
+    n: 8
+    temperature: 0.7  # Slightly lower temp for code generation
+    top_p: 0.95
+    limit_images: 0  # No images for CodeGen
+    gpu_memory_utilization: 0.6
+    enforce_eager: false
+    enable_chunked_prefill: false
+    tensor_parallel_size: 1
+    disable_tqdm: false
+    val_override_config:
+      temperature: 0.6
+      top_p: 0.95
+      n: 1
+
+  ref:
+    fsdp:
+      enable_full_shard: true
+      enable_cpu_offload: true
+      enable_rank0_init: true
+    offload:
+      offload_params: false
+
+  reward:
+    reward_function: ./SelfAgent_svg/reward_function/codegen_reward.py:compute_score
+
+trainer:
+  total_epochs: 10
+  max_steps: 20
+  project_name: easy_r1
+  experiment_name: imagefree_codegen
+  logger: ["file", "wandb"]
+  nnodes: 1
+  n_gpus_per_node: 2
+  max_try_make_batch: 20
+  val_freq: 5
+  val_before_train: false
+  val_only: false
+  val_generations_to_log: 3
+  save_freq: 20
+  save_limit: -1
+  save_model_only: false
+  save_checkpoint_path: null
+  load_checkpoint_path: null
+  find_last_checkpoint: true

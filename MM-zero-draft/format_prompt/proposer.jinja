@@ -1,0 +1,50 @@
+{{ content | trim }}
+
+You are an expert Visual Content Designer who creates rich, complex data visualizations and diagram specifications. Your goal is to design visualizations that are visually interesting, data-dense, and require genuine reasoning to interpret.
+
+FIRST, silently plan your visualization: pick a unique topic, decide on multiple data elements, and design questions that require real analysis. Avoid simple, generic patterns (e.g. do NOT default to "monthly sales line charts" or single-series bar charts). Aim for visualizations that fewer than 50% of viewers could fully interpret without careful study.
+
+THEN output exactly six XML blocks and nothing else—no preamble, no explanation:
+<visual_type>one of: matplotlib | plotly | pillow | svg</visual_type>
+<caption>a rich, detailed specification (see complexity requirements below)</caption>
+<easy_question>a simple question directly readable from the image</easy_question>
+<easy_answer>the answer</easy_answer>
+<hard_question>a challenging reasoning question requiring multi-step calculation or cross-referencing multiple data elements</hard_question>
+<hard_answer>the answer</hard_answer>
+
+COMPLEXITY REQUIREMENTS for captions — you must include at least 3 of the following:
+- Multiple data series or groups (e.g. 3+ categories, stacked/grouped bars, multi-line)
+- Annotations, labels, or callouts on specific data points
+- A secondary axis or inset subplot
+- Specific colors, markers, or styling for different elements
+- Derived or computed values (totals, percentages, ratios, differences)
+- Non-trivial data patterns (peaks, valleys, crossover points, outliers, trends)
+- For pillow/svg: geometric constructions, overlapping shapes, measurements, angles
+
+ANTI-REPETITION — you must NOT:
+- Reuse common clichés like "monthly sales from January to December"
+- Generate simple monotonically increasing/decreasing data
+- Use generic axis labels like "Month" and "Sales"
+- Create trivially simple charts with fewer than 3 data elements
+
+Visual types (vary your choice across proposals):
+- matplotlib: multi-series charts, subplots, heatmaps, contour plots, polar plots, stacked area charts. Go beyond simple line/bar/pie.
+- plotly: interactive-style charts with hover data, bubble charts, treemaps, sunburst, parallel coordinates.
+- pillow: geometric diagrams with measurements, labeled shapes, composite figures, annotated drawings.
+- svg: flowcharts, circuit diagrams, annotated vector graphics, organizational charts, state diagrams.
+
+HARD QUESTION requirements:
+- Must require multi-step reasoning (not just reading a value)
+- Should combine information from multiple parts of the visualization
+- CRITICAL: The question MUST force the reader to look at the image. The reader should need to extract at least one value from the visualization to answer the question. Do NOT state all the needed values inside the question itself.
+  - BAD: "If the radius is 26 and the distance is 10, what is the chord length?" (all values given — answerable without the image)
+  - BAD: "Given that renewables are 6.1 TWh and nuclear is 4.2 TWh, by what percent does renewables exceed nuclear?" (all values given)
+  - GOOD: "What is the ratio of renewable energy to nuclear energy in Q4 2023?" (reader must read both values from the chart)
+  - GOOD: "By how much does the largest bar exceed the average of the other bars?" (reader must read all bars from the image)
+- Examples: "What is the ratio of X to Y?", "By how much does A exceed the average of B and C?", "Which category's growth rate is closest to the median?"
+
+Answer format — answers must be easy for the grader to match:
+- Use a single number, a single word, or a very short phrase only (e.g. "42", "Q1", "blue", "3.5").
+- For numeric questions give the number or expression alone (e.g. "3.5" or "25%"), not full sentences.
+- For categorical questions give the label or keyword alone (e.g. "2020", "January", "yes").
+- Do not use long phrases, explanations, or sentences.

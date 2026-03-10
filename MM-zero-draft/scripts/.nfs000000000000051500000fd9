@@ -1,0 +1,114 @@
+#!/bin/bash
+# =============================================================================
+# ImageFree Self-Play: Proposer Training (EasyR1)
+# =============================================================================
+# The Proposer generates chart descriptions (captions), easy questions, and hard questions.
+# It is text-only — no images needed.
+#
+# Reward pipeline (per proposer output):
+#   1. Caption + questions → CodeGen service → matplotlib code (N=8 samples)
+#   2. Code → render subprocess → image
+#   3. For each successful render:
+#      a) image + easy_q → Solver (8 rollouts) → solvability score
+#      b) image + hard_q → Solver (8 rollouts) → difficulty score
+#   4. reward = (sum of contributions) / N
+#
+# Services:
+#   GPUs 4-5: CodeGen vLLM service (ports 7000-7001)
+#   GPUs 6-7: Solver  vLLM service (ports 6000-6001)
+#
+# Usage: bash SelfAgent/scripts/proposer_train.sh \
+#            <solver_model> <proposer_model> <codegen_model> <save_name>
+# =============================================================================
+
+set -x
+
+solver_model_path=$1
+proposer_model_path=$2
+codegen_model_path=$3
+save_path=$4
+
+echo "========================================"
+echo "Proposer Training: $save_path"
+echo "  Solver model (for reward):  $solver_model_path"
+echo "  CodeGen model (for reward): $codegen_model_path"
+echo "  Proposer init model:        $proposer_model_path"
+echo "========================================"
+
+# Generate unique RUN_ID
+RUN_ID=$(date +%s%N)
+export RUN_ID
+echo "RUN_ID=$RUN_ID"
+
+# Launch BOTH CodeGen and Solver as vLLM services
+# CodeGen on GPUs 4-5 (ports 7000-7001), Solver on GPUs 6-7 (ports 6000-6001)
+# Pass max_model_len for 40GB GPUs so KV cache fits (see main.sh GPU_MEM)
+GPU_MEM=${GPU_MEM:-40}
+VLLM_MAX_LEN=""
+if [ "$GPU_MEM" = "40" ]; then
+    VLLM_MAX_LEN="32768"
+fi
+bash SelfAgent/vllm_service_init/start_proposer_services.sh $codegen_model_path $solver_model_path $VLLM_MAX_LEN
+echo "CodeGen + Solver services started"
+
+# Load chosen ports (default or alternates if 7000-7001/6000-6001 were in use)
+if [ -f "${STORAGE_PATH:-.}/temp_results/proposer_service_ports.env" ]; then
+    set -a
+    source "${STORAGE_PATH:-.}/temp_results/proposer_service_ports.env"
+    set +a
+fi
+export CODEGEN_PORT_0=${CODEGEN_PORT_0:-7010}
+export CODEGEN_PORT_1=${CODEGEN_PORT_1:-7011}
+export SOLVER_PORT_0=${SOLVER_PORT_0:-6010}
+export SOLVER_PORT_1=${SOLVER_PORT_1:-6011}
+
+# Wait for vLLM to load models and finish torch.compile + CUDA graph capture (often 60–90s total).
+echo "[proposer_train] Waiting 90s for vLLM engines to initialize (model load + compile)..."
+sleep 90
+
+# Quick check: our CodeGen and Solver ports must be reachable or reward will get "CodeGen results not found".
+echo "[proposer_train] Checking CodeGen and Solver services..."
+for port in $CODEGEN_PORT_0 $CODEGEN_PORT_1 $SOLVER_PORT_0 $SOLVER_PORT_1; do
+    if curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 "http://127.0.0.1:${port}/" 2>/dev/null | grep -q '[0-9]'; then
+        echo "  port $port: reachable"
+    else
+        echo "  port $port: NOT reachable (check logs in ${STORAGE_PATH:-.}/temp_results/)"
+    fi
+done
+
+# Train Proposer with GRPO on GPUs 0-3 (config chosen by GPU_MEM: 40gb or 80gb)
+echo "Starting Proposer GRPO training..."
+CUDA_VISIBLE_DEVICES=0,1,2,3 python3 -m verl.trainer.main \
+    config=SelfAgent/configs/imagefree_proposer_config_${GPU_MEM}gb.yaml \
+    data.train_files=./SelfAgent/data/text_seed_prompts.parquet \
+    data.val_files=hiyouga/geometry3k@test \
+    data.prompt_key=problem \
+    data.answer_key=answer \
+    worker.actor.model.model_path=$proposer_model_path \
+    worker.rollout.n=8 \
+    trainer.max_steps=20 \
+    trainer.experiment_name=$save_path \
+    trainer.save_checkpoint_path=${STORAGE_PATH}/models/$save_path \
+    trainer.total_epochs=10 \
+    trainer.n_gpus_per_node=4 \
+    trainer.val_before_train=false
+
+sleep 5
+
+# Merge FSDP shards into HuggingFace format (only if training produced a checkpoint)
+ACTOR_DIR="${STORAGE_PATH}/models/$save_path/global_step_20/actor"
+if [ -d "$ACTOR_DIR" ]; then
+    echo "Merging model shards..."
+    python scripts/model_merger.py --local_dir "$ACTOR_DIR"
+else
+    echo "ERROR: No checkpoint found at $ACTOR_DIR (Proposer training may have failed). Skipping model merge."
+    exit 1
+fi
+
+sleep 10
+
+# Kill all vLLM service processes (both CodeGen and Solver)
+pkill -f "start_vllm_server" || true
+pkill -f "start_codegen_server" || true
+
+echo "Proposer training finished: $save_path"

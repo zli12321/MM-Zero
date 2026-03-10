@@ -1,0 +1,159 @@
+#!/bin/bash
+# =============================================================================
+# ImageFree Self-Play: Main Orchestrator (EasyR1)
+# =============================================================================
+# Runs the full 3-model self-play loop for 3 iterations:
+#   Iteration 1: Proposer v1 → CodeGen v1 → Solver v1
+#   Iteration 2: Proposer v2 → CodeGen v2 → Solver v2
+#   Iteration 3: Proposer v3 → CodeGen v3 → Solver v3
+#
+# All three models start from the same base VLM and co-evolve.
+#
+# Proposer training uses BOTH CodeGen and Solver as reward services:
+#   proposer_train.sh <solver_model> <proposer_model> <codegen_model> <save_name>
+#
+# Usage: bash SelfAgent/scripts/main.sh
+# =============================================================================
+
+set -e  # Exit on error
+
+# -----------------------------------------------------------------------------
+# GPU memory: set to 40 or 80 (GB per GPU). Chooses configs and vLLM max_model_len.
+# -----------------------------------------------------------------------------
+export GPU_MEM="${GPU_MEM:-40}"
+if [ "$GPU_MEM" != "40" ] && [ "$GPU_MEM" != "80" ]; then
+    echo "ERROR: GPU_MEM must be 40 or 80 (got: $GPU_MEM). Export GPU_MEM=40 or GPU_MEM=80"
+    exit 1
+fi
+echo "Using GPU memory tier: ${GPU_MEM}GB (configs: *_config_${GPU_MEM}gb.yaml)"
+
+# export WANDB_MODE=offline
+# export WANDB_DIR=yourpath/wandb
+
+# -----------------------------------------------------------------------------
+# Render workers: parallel matplotlib renders during Proposer reward (CPU-bound).
+# Default = half of logical CPUs (leaves headroom for training/CodeGen/Solver).
+# Override with RENDER_MAX_WORKERS=... (e.g. export RENDER_MAX_WORKERS=96).
+# -----------------------------------------------------------------------------
+if [ -z "${RENDER_MAX_WORKERS}" ]; then
+    NCPU=$(nproc 2>/dev/null || sysctl -n hw.logicalcpu 2>/dev/null || echo "16")
+    RENDER_MAX_WORKERS=$(( NCPU / 2 ))
+    [ "$RENDER_MAX_WORKERS" -lt 8 ] && RENDER_MAX_WORKERS=8
+    echo "RENDER_MAX_WORKERS=$RENDER_MAX_WORKERS (auto: half of $NCPU logical CPUs)"
+else
+    echo "RENDER_MAX_WORKERS=$RENDER_MAX_WORKERS (from env)"
+fi
+export RENDER_MAX_WORKERS
+
+export STORAGE_PATH="${STORAGE_PATH:-/home/ubuntu/AgentTesting/}"
+export HUGGINGFACENAME=""
+
+# export HF_HOME=/workspace/.cache/huggingface
+Base_model="${Base_model:-/home/ubuntu/AgentTesting/hub/models--Qwen--Qwen2.5-VL-3B-Instruct/snapshots/66285546d2b821cf421d4f5eb2576359d3770cd3}"
+Model_abbr=Qwen2.5-VL-3B-Instruct-ImageFree
+echo "Model_abbr: $Model_abbr"
+echo "Base_model: $Base_model"
+echo "STORAGE_PATH: $STORAGE_PATH"
+
+mkdir -p "$STORAGE_PATH/evaluation" \
+         "$STORAGE_PATH/models" \
+         "$STORAGE_PATH/generated_proposals" \
+         "$STORAGE_PATH/generated_code" \
+         "$STORAGE_PATH/rendered_images" \
+         "$STORAGE_PATH/local_parquet" \
+         "$STORAGE_PATH/temp_results"
+
+# =============================================================================
+# Iteration 1: All three models start from the base model
+# =============================================================================
+echo "=========================================="
+echo "Starting Iteration 1"
+echo "=========================================="
+
+# Train Proposer v1
+# Args: <solver_model> <proposer_model> <codegen_model> <save_name>
+# In iteration 1, all three roles use the base model
+echo "[Iter 1] Training Proposer v1..."
+bash SelfAgent/scripts/proposer_train.sh \
+    $Base_model \
+    $Base_model \
+    $Base_model \
+    ${Model_abbr}_proposer_v1
+
+sleep 10
+
+# Train CodeGen v1 (CodeGen init = base model, uses Proposer v1 for proposals)
+echo "[Iter 1] Training CodeGen v1..."
+bash SelfAgent/scripts/codegen_train.sh \
+    $Base_model \
+    ${STORAGE_PATH}/models/${Model_abbr}_proposer_v1/global_step_20/actor/huggingface \
+    ${Model_abbr}_codegen_v1
+
+sleep 10
+
+# Train Solver v1 (Solver init = base, Proposer v1 for questions, CodeGen v1 for images)
+echo "[Iter 1] Training Solver v1..."
+bash SelfAgent/scripts/solver_train.sh \
+    $Base_model \
+    ${STORAGE_PATH}/models/${Model_abbr}_proposer_v1/global_step_20/actor/huggingface \
+    ${STORAGE_PATH}/models/${Model_abbr}_codegen_v1/global_step_20/actor/huggingface \
+    ${Model_abbr}_solver_v1
+
+sleep 10
+
+# =============================================================================
+# Iterations 2+: Each model evolves from its previous version
+# =============================================================================
+for i in {2..3}; do
+    prev=$((i-1))
+    echo "=========================================="
+    echo "Starting Iteration $i"
+    echo "=========================================="
+
+    # --- Proposer v_i ---
+    # Reward uses: Solver v_{i-1} + CodeGen v_{i-1}
+    # Init from: Proposer v_{i-1}
+    if [ -d "${STORAGE_PATH}/models/${Model_abbr}_proposer_v${i}/global_step_20/actor/huggingface" ]; then
+        echo "[Iter $i] Proposer v${i} already exists, skipping..."
+    else
+        echo "[Iter $i] Training Proposer v${i}..."
+        bash SelfAgent/scripts/proposer_train.sh \
+            ${STORAGE_PATH}/models/${Model_abbr}_solver_v${prev}/global_step_20/actor/huggingface \
+            ${STORAGE_PATH}/models/${Model_abbr}_proposer_v${prev}/global_step_20/actor/huggingface \
+            ${STORAGE_PATH}/models/${Model_abbr}_codegen_v${prev}/global_step_20/actor/huggingface \
+            ${Model_abbr}_proposer_v${i}
+    fi
+
+    sleep 10
+
+    # --- CodeGen v_i ---
+    if [ -d "${STORAGE_PATH}/models/${Model_abbr}_codegen_v${i}/global_step_20/actor/huggingface" ]; then
+        echo "[Iter $i] CodeGen v${i} already exists, skipping..."
+    else
+        echo "[Iter $i] Training CodeGen v${i}..."
+        bash SelfAgent/scripts/codegen_train.sh \
+            ${STORAGE_PATH}/models/${Model_abbr}_codegen_v${prev}/global_step_20/actor/huggingface \
+            ${STORAGE_PATH}/models/${Model_abbr}_proposer_v${i}/global_step_20/actor/huggingface \
+            ${Model_abbr}_codegen_v${i}
+    fi
+
+    sleep 10
+
+    # --- Solver v_i ---
+    if [ -d "${STORAGE_PATH}/models/${Model_abbr}_solver_v${i}/global_step_20/actor/huggingface" ]; then
+        echo "[Iter $i] Solver v${i} already exists, skipping..."
+    else
+        echo "[Iter $i] Training Solver v${i}..."
+        bash SelfAgent/scripts/solver_train.sh \
+            ${STORAGE_PATH}/models/${Model_abbr}_solver_v${prev}/global_step_20/actor/huggingface \
+            ${STORAGE_PATH}/models/${Model_abbr}_proposer_v${i}/global_step_20/actor/huggingface \
+            ${STORAGE_PATH}/models/${Model_abbr}_codegen_v${i}/global_step_20/actor/huggingface \
+            ${Model_abbr}_solver_v${i}
+    fi
+
+    sleep 10
+done
+
+echo "=========================================="
+echo "ImageFree Self-Play training complete!"
+echo "=========================================="
