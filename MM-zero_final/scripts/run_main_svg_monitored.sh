@@ -2,7 +2,7 @@
 # =============================================================================
 # Monitored run of main_svg.sh: on failure, log to CHANGELOG_SVG_RUN.md and
 # restart (main_svg skips completed steps). Stops after MAX_RESTARTS failures.
-# Run from repo root: bash SelfAgent_svg/scripts/run_main_svg_monitored.sh
+# Run from repo root: bash MM-zero_final/scripts/run_main_svg_monitored.sh
 # =============================================================================
 
 set +e
@@ -14,7 +14,7 @@ export STORAGE_PATH
 LOG_DIR="${STORAGE_PATH}/temp_results"
 CHANGELOG="${SCRIPT_DIR}/../CHANGELOG_SVG_RUN.md"
 RUN_LOG="${LOG_DIR}/main_svg_run.log"
-MAIN_SVG="${REPO_ROOT}/SelfAgent_svg/scripts/main_svg.sh"
+MAIN_SVG="${REPO_ROOT}/MM-zero_final/scripts/main_svg.sh"
 
 # After this many consecutive failures, stop (so you can fix and re-run)
 MAX_RESTARTS="${MAX_RESTARTS:-5}"

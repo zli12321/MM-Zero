@@ -1,6 +1,6 @@
 #!/bin/bash
 # Kill all running training and vLLM processes so you can restart clean.
-# Usage: bash SelfAgent_svg/scripts/kill_training.sh
+# Usage: bash MM-zero_final/scripts/kill_training.sh
 # Run from repo root (e.g. /workspace/Self-Agent).
 
 set +e
