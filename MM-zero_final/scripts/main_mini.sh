@@ -17,7 +17,7 @@
 #   Solver:   rollout_batch_size=16, n=2    → 32 total, 16 proposals/GPU
 #   Iterations: 1
 #
-# Usage: bash SelfAgent/scripts/main_mini.sh
+# Usage: bash MM-zero_final/scripts/main_mini.sh
 # =============================================================================
 
 set -e
@@ -163,7 +163,7 @@ echo "=========================================="
 
 # Train Proposer v1
 echo "[MINI][Iter 1] Training Proposer v1..."
-bash SelfAgent/scripts/proposer_train.sh \
+bash MM-zero_final/scripts/proposer_train.sh \
     $Base_model \
     $Base_model \
     $Base_model \
@@ -174,7 +174,7 @@ sleep 5
 
 # Train CodeGen v1
 echo "[MINI][Iter 1] Training CodeGen v1..."
-bash SelfAgent/scripts/codegen_train.sh \
+bash MM-zero_final/scripts/codegen_train.sh \
     $Base_model \
     ${STORAGE_PATH}/models/${Model_abbr}_proposer_v1/global_step_${TRAIN_STEPS}/actor/huggingface \
     ${Model_abbr}_codegen_v1
@@ -184,7 +184,7 @@ sleep 5
 
 # Train Solver v1
 echo "[MINI][Iter 1] Training Solver v1..."
-bash SelfAgent/scripts/solver_train.sh \
+bash MM-zero_final/scripts/solver_train.sh \
     $Base_model \
     ${STORAGE_PATH}/models/${Model_abbr}_proposer_v1/global_step_${TRAIN_STEPS}/actor/huggingface \
     ${STORAGE_PATH}/models/${Model_abbr}_codegen_v1/global_step_${TRAIN_STEPS}/actor/huggingface \

@@ -6,7 +6,7 @@
 # If a previous iteration's checkpoint is missing, it falls back to $Base_model.
 # This makes it safe to run from scratch or with partial checkpoints.
 #
-# Usage: bash SelfAgent/scripts/main_base.sh
+# Usage: bash MM-zero_final/scripts/main_base.sh
 # =============================================================================
 
 set -e
@@ -166,7 +166,7 @@ for i in $(seq 1 $NUM_ITERATIONS); do
         echo "[Iter $i] Proposer v${i} already exists, skipping..."
     else
         echo "[Iter $i] Training Proposer v${i}..."
-        bash SelfAgent/scripts/proposer_train.sh \
+        bash MM-zero_final/scripts/proposer_train.sh \
             "$SOLVER_FOR_REWARD" \
             "$PROPOSER_INIT" \
             "$CODEGEN_FOR_REWARD" \
@@ -184,7 +184,7 @@ for i in $(seq 1 $NUM_ITERATIONS); do
         echo "[Iter $i] CodeGen v${i} already exists, skipping..."
     else
         echo "[Iter $i] Training CodeGen v${i}..."
-        bash SelfAgent/scripts/codegen_train.sh \
+        bash MM-zero_final/scripts/codegen_train.sh \
             "$CODEGEN_INIT" \
             "$PROPOSER_TRAINED" \
             ${Model_abbr}_codegen_v${i}
@@ -201,7 +201,7 @@ for i in $(seq 1 $NUM_ITERATIONS); do
         echo "[Iter $i] Solver v${i} already exists, skipping..."
     else
         echo "[Iter $i] Training Solver v${i}..."
-        bash SelfAgent/scripts/solver_train.sh \
+        bash MM-zero_final/scripts/solver_train.sh \
             "$SOLVER_INIT" \
             "$PROPOSER_TRAINED" \
             "$CODEGEN_TRAINED" \

@@ -11,7 +11,7 @@
 #   4. Evaluate hard questions with the Solver to get silver labels
 #   5. Filter by difficulty (score 0.3–0.8) and train Solver with GRPO
 #
-# Usage: bash SelfAgent/scripts/solver_train.sh <solver_model> <proposer_model> <codegen_model> <save_name>
+# Usage: bash MM-zero_final/scripts/solver_train.sh <solver_model> <proposer_model> <codegen_model> <save_name>
 # =============================================================================
 
 set -x

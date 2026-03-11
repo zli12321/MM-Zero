@@ -9,7 +9,7 @@
 #   - Proposer v1 must already be trained and saved at:
 #     STORAGE_PATH/models/${Model_abbr}_proposer_v1/global_step_${TRAIN_STEPS}/actor/huggingface
 #
-# Usage: bash SelfAgent/scripts/main_from_codegen.sh
+# Usage: bash MM-zero_final/scripts/main_from_codegen.sh
 # =============================================================================
 
 set -e  # Exit on error
@@ -143,7 +143,7 @@ echo "[Iter 1] Using existing Proposer v1: $PROPOSER_V1_PATH"
 
 # Train CodeGen v1 (CodeGen init = base model, uses Proposer v1 for proposals)
 echo "[Iter 1] Training CodeGen v1..."
-bash SelfAgent/scripts/codegen_train.sh \
+bash MM-zero_final/scripts/codegen_train.sh \
     $Base_model \
     ${STORAGE_PATH}/models/${Model_abbr}_proposer_v1/global_step_${TRAIN_STEPS}/actor/huggingface \
     ${Model_abbr}_codegen_v1
@@ -153,7 +153,7 @@ sleep 5
 
 # Train Solver v1 (Solver init = base, Proposer v1 for questions, CodeGen v1 for images)
 echo "[Iter 1] Training Solver v1..."
-bash SelfAgent/scripts/solver_train.sh \
+bash MM-zero_final/scripts/solver_train.sh \
     $Base_model \
     ${STORAGE_PATH}/models/${Model_abbr}_proposer_v1/global_step_${TRAIN_STEPS}/actor/huggingface \
     ${STORAGE_PATH}/models/${Model_abbr}_codegen_v1/global_step_${TRAIN_STEPS}/actor/huggingface \
@@ -178,7 +178,7 @@ for i in {2..3}; do
         echo "[Iter $i] Proposer v${i} already exists, skipping..."
     else
         echo "[Iter $i] Training Proposer v${i}..."
-        bash SelfAgent/scripts/proposer_train.sh \
+        bash MM-zero_final/scripts/proposer_train.sh \
             ${STORAGE_PATH}/models/${Model_abbr}_solver_v${prev}/global_step_${TRAIN_STEPS}/actor/huggingface \
             ${STORAGE_PATH}/models/${Model_abbr}_proposer_v${prev}/global_step_${TRAIN_STEPS}/actor/huggingface \
             ${STORAGE_PATH}/models/${Model_abbr}_codegen_v${prev}/global_step_${TRAIN_STEPS}/actor/huggingface \
@@ -193,7 +193,7 @@ for i in {2..3}; do
         echo "[Iter $i] CodeGen v${i} already exists, skipping..."
     else
         echo "[Iter $i] Training CodeGen v${i}..."
-        bash SelfAgent/scripts/codegen_train.sh \
+        bash MM-zero_final/scripts/codegen_train.sh \
             ${STORAGE_PATH}/models/${Model_abbr}_codegen_v${prev}/global_step_${TRAIN_STEPS}/actor/huggingface \
             ${STORAGE_PATH}/models/${Model_abbr}_proposer_v${i}/global_step_${TRAIN_STEPS}/actor/huggingface \
             ${Model_abbr}_codegen_v${i}
@@ -207,7 +207,7 @@ for i in {2..3}; do
         echo "[Iter $i] Solver v${i} already exists, skipping..."
     else
         echo "[Iter $i] Training Solver v${i}..."
-        bash SelfAgent/scripts/solver_train.sh \
+        bash MM-zero_final/scripts/solver_train.sh \
             ${STORAGE_PATH}/models/${Model_abbr}_solver_v${prev}/global_step_${TRAIN_STEPS}/actor/huggingface \
             ${STORAGE_PATH}/models/${Model_abbr}_proposer_v${i}/global_step_${TRAIN_STEPS}/actor/huggingface \
             ${STORAGE_PATH}/models/${Model_abbr}_codegen_v${i}/global_step_${TRAIN_STEPS}/actor/huggingface \

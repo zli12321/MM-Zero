@@ -11,7 +11,7 @@
 #
 # The Solver runs as a vLLM service on GPUs 2-7 for functional reward.
 #
-# Usage: bash SelfAgent/scripts/codegen_train.sh <codegen_model> <proposer_model> <save_name>
+# Usage: bash MM-zero_final/scripts/codegen_train.sh <codegen_model> <proposer_model> <save_name>
 # =============================================================================
 
 set -x

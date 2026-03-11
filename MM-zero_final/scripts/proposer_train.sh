@@ -17,7 +17,7 @@
 #   GPUs 2-4: CodeGen vLLM service (ports 7000-7002)
 #   GPUs 5-7: Solver  vLLM service (ports 6000-6002)
 #
-# Usage: bash SelfAgent/scripts/proposer_train.sh \
+# Usage: bash MM-zero_final/scripts/proposer_train.sh \
 #            <solver_model> <proposer_model> <codegen_model> <save_name>
 # =============================================================================
 
