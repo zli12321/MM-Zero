@@ -1,6 +1,6 @@
 #!/bin/bash
 # Launch code generation across 8 GPUs in parallel.
-# Usage: bash SelfAgent/code_generate/code_generate.bash <model_path> <experiment_name>
+# Usage: bash MM-zero_final/code_generate/code_generate.bash <model_path> <experiment_name>
 
 model_name=$1
 save_name=$2
@@ -8,7 +8,7 @@ save_name=$2
 export VLLM_DISABLE_COMPILE_CACHE=1
 
 for i in {0..7}; do
-    CUDA_VISIBLE_DEVICES=$i python SelfAgent_svg/code_generate/code_generate.py \
+    CUDA_VISIBLE_DEVICES=$i python MM-zero_final/code_generate/code_generate.py \
         --model $model_name --suffix $i --save_name $save_name &
 done
 

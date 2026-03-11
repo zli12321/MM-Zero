@@ -260,10 +260,9 @@ def extract_fields(predict: str) -> Optional[Dict[str, str]]:
 
 
 # ========================== Code Rendering ========================== #
-try:
-    from SelfAgent_svg.code_render.render_code import render_single, render_batch_codes
-except ImportError:
-    from code_render.render_code import render_single, render_batch_codes
+import sys as _sys
+_sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from code_render.render_code import render_single, render_batch_codes
 
 
 # ========================== Diversity Penalty ========================== #

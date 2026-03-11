@@ -10,8 +10,8 @@ Topics are intentionally broad — no chart types, no specific years, no data va
 The model is free to choose visualization type, invent data, and create diverse Q&A.
 
 Usage:
-    python SelfAgent/data/generate_seed_prompts.py
-    # Output: SelfAgent/data/text_seed_prompts.parquet
+    python MM-zero_final/data/generate_seed_prompts.py
+    # Output: MM-zero_final/data/text_seed_prompts.parquet
 """
 
 import pandas as pd

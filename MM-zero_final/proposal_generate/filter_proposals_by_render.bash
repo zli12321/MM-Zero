@@ -13,7 +13,7 @@ render_workers=${6:-8}
 echo "[filter] Filtering proposals across 8 GPUs (n_samples=$n_samples, rate=[$min_rate, $max_rate])"
 
 for i in {0..7}; do
-    CUDA_VISIBLE_DEVICES=$i python SelfAgent_svg/proposal_generate/filter_proposals_by_render.py \
+    CUDA_VISIBLE_DEVICES=$i python MM-zero_final/proposal_generate/filter_proposals_by_render.py \
         --codegen_model $codegen_model \
         --save_name $save_name \
         --suffix $i \

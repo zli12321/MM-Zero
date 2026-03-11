@@ -6,7 +6,7 @@
 #   GPUs 0-3: Training (not managed here)
 #   GPUs 4-7: Solver service (4 instances, ports 6000-6003)
 #
-# Usage: bash SelfAgent_svg/vllm_service_init/start_solver_services.sh <model_path> <run_id> [max_model_len]
+# Usage: bash MM-zero_final/vllm_service_init/start_solver_services.sh <model_path> <run_id> [max_model_len]
 #   max_model_len: optional; use for 40GB GPUs (e.g. 32768).
 #   Set SOLVER_GPU_MEM_UTIL env var to control gpu_mem_util (default 0.45).
 # =============================================================================
@@ -27,13 +27,13 @@ LOG_DIR="${STORAGE_PATH:-.}/temp_results"
 mkdir -p "$LOG_DIR"
 PIDS_FILE="$LOG_DIR/solver_service_pids.env"
 
-nohup env CUDA_VISIBLE_DEVICES=4 python SelfAgent_svg/vllm_service_init/start_vllm_server.py --port 6000 --model_path $model_path $EXTRA >> "$LOG_DIR/solver_6000.log" 2>&1 &
+nohup env CUDA_VISIBLE_DEVICES=4 python MM-zero_final/vllm_service_init/start_vllm_server.py --port 6000 --model_path $model_path $EXTRA >> "$LOG_DIR/solver_6000.log" 2>&1 &
 SOLVER_PID_0=$!
-nohup env CUDA_VISIBLE_DEVICES=5 python SelfAgent_svg/vllm_service_init/start_vllm_server.py --port 6001 --model_path $model_path $EXTRA >> "$LOG_DIR/solver_6001.log" 2>&1 &
+nohup env CUDA_VISIBLE_DEVICES=5 python MM-zero_final/vllm_service_init/start_vllm_server.py --port 6001 --model_path $model_path $EXTRA >> "$LOG_DIR/solver_6001.log" 2>&1 &
 SOLVER_PID_1=$!
-nohup env CUDA_VISIBLE_DEVICES=6 python SelfAgent_svg/vllm_service_init/start_vllm_server.py --port 6002 --model_path $model_path $EXTRA >> "$LOG_DIR/solver_6002.log" 2>&1 &
+nohup env CUDA_VISIBLE_DEVICES=6 python MM-zero_final/vllm_service_init/start_vllm_server.py --port 6002 --model_path $model_path $EXTRA >> "$LOG_DIR/solver_6002.log" 2>&1 &
 SOLVER_PID_2=$!
-nohup env CUDA_VISIBLE_DEVICES=7 python SelfAgent_svg/vllm_service_init/start_vllm_server.py --port 6003 --model_path $model_path $EXTRA >> "$LOG_DIR/solver_6003.log" 2>&1 &
+nohup env CUDA_VISIBLE_DEVICES=7 python MM-zero_final/vllm_service_init/start_vllm_server.py --port 6003 --model_path $model_path $EXTRA >> "$LOG_DIR/solver_6003.log" 2>&1 &
 SOLVER_PID_3=$!
 
 {

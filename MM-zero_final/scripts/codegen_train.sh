@@ -87,7 +87,7 @@ echo "[Pre-flight] GPU cleanup done."
 # Step 1: Generate proposals from the Proposer
 NUM_PROPOSALS_PER_GPU=${NUM_PROPOSALS_PER_GPU:-500}
 echo "[Step 1/5] Generating proposals (${NUM_PROPOSALS_PER_GPU} per GPU)..."
-bash SelfAgent_svg/proposal_generate/proposal_generate.bash $proposer_model_path $NUM_PROPOSALS_PER_GPU $save_path
+bash MM-zero_final/proposal_generate/proposal_generate.bash $proposer_model_path $NUM_PROPOSALS_PER_GPU $save_path
 
 # Clean GPUs after proposal generation (8 vLLM processes on GPUs 0-7)
 echo "[Step 1→2] Killing all GPU processes after proposal generation..."
@@ -123,7 +123,7 @@ FILTER_MIN_RATE=${FILTER_MIN_RENDER_RATE:-0.25}
 FILTER_MAX_RATE=${FILTER_MAX_RENDER_RATE:-0.75}
 FILTER_WORKERS=${FILTER_RENDER_WORKERS:-8}
 echo "[Step 2/5] Filtering proposals by render success rate (8 GPUs, n=${FILTER_N_SAMPLES}, rate=[${FILTER_MIN_RATE}, ${FILTER_MAX_RATE}])..."
-bash SelfAgent_svg/proposal_generate/filter_proposals_by_render.bash \
+bash MM-zero_final/proposal_generate/filter_proposals_by_render.bash \
     $codegen_model_path $save_path $FILTER_N_SAMPLES $FILTER_MIN_RATE $FILTER_MAX_RATE $FILTER_WORKERS
 
 # Clean GPUs after filtering
@@ -228,7 +228,7 @@ VLLM_MAX_LEN=""
 # Use gpu_mem_util=0.45 so each Solver needs ~36 GiB; fits when GPUs have leftover memory.
 export SOLVER_GPU_MEM_UTIL=0.45
 echo "[Step 4/5] Starting vLLM Solver service (RUN_ID=$RUN_ID, SOLVER_GPU_MEM_UTIL=$SOLVER_GPU_MEM_UTIL)..."
-bash SelfAgent_svg/vllm_service_init/start_solver_services.sh "$codegen_model_path" "$RUN_ID" "$VLLM_MAX_LEN"
+bash MM-zero_final/vllm_service_init/start_solver_services.sh "$codegen_model_path" "$RUN_ID" "$VLLM_MAX_LEN"
 
 # Wait for vLLM services to be ready with health checks
 echo "[Step 4/5] Waiting for Solver services to be ready..."
@@ -356,7 +356,7 @@ EXTRA_ARGS=""
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 echo "[Step 5/5] Starting CodeGen GRPO training (max_steps=$TRAIN_STEPS, rollout.n=${ROLLOUT_N}, rollout_batch_size=${ROLLOUT_BATCH_SIZE:-config})..."
 CUDA_VISIBLE_DEVICES=0,1,2,3 python3 -m verl.trainer.main \
-    config=SelfAgent_svg/configs/imagefree_codegen_config_${GPU_MEM}gb${MODEL_SIZE:+_${MODEL_SIZE}}.yaml \
+    config=MM-zero_final/configs/imagefree_codegen_config_${GPU_MEM}gb${MODEL_SIZE:+_${MODEL_SIZE}}.yaml \
     data.train_files=${STORAGE_PATH}/generated_proposals/${save_path}_proposals.parquet \
     data.val_files=hiyouga/geometry3k@test \
     data.prompt_key=prompt_text \

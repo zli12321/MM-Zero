@@ -8,7 +8,7 @@
 
 1. **Check if the run completed:** Look for an entry below like `[SUCCESS] Run finished at ...`. If present, the full pipeline finished.
 2. **If there are failure entries:** Each `[FAILURE]` block contains the time, exit code, and last lines of the run log. Fixes applied (by you or the assistant) are documented in the same block under **FIX APPLIED**.
-3. **To resume after a fix:** Run the same command you used to start (e.g. `bash SelfAgent_svg/scripts/run_main_svg_monitored.sh`). The pipeline skips already-completed steps (existing checkpoints).
+3. **To resume after a fix:** Run the same command you used to start (e.g. `bash MM-zero_final/scripts/run_main_svg_monitored.sh`). The pipeline skips already-completed steps (existing checkpoints).
 
 ---
 

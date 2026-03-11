@@ -17,7 +17,7 @@ data:
   rollout_batch_size: 256  # Smaller batch — code rendering is expensive
   mini_rollout_batch_size: null
   val_batch_size: 512
-  format_prompt: ./SelfAgent_svg/format_prompt/codegen.jinja
+  format_prompt: ./MM-zero_final/format_prompt/codegen.jinja
   override_chat_template: null
   shuffle: true
   seed: 1
@@ -92,7 +92,7 @@ worker:
       offload_params: false
 
   reward:
-    reward_function: ./SelfAgent_svg/reward_function/codegen_reward.py:compute_score
+    reward_function: ./MM-zero_final/reward_function/codegen_reward.py:compute_score
 
 trainer:
   total_epochs: 10

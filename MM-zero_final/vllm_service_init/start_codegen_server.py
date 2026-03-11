@@ -15,7 +15,7 @@ Setup:
     pip install stopit flask vllm transformers
 
 Usage:
-    CUDA_VISIBLE_DEVICES=4 python SelfAgent/vllm_service_init/start_codegen_server.py --port 7000 --model_path <path>
+    CUDA_VISIBLE_DEVICES=4 python MM-zero_final/vllm_service_init/start_codegen_server.py --port 7000 --model_path <path>
 """
 
 from flask import Flask, request, jsonify

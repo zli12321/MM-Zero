@@ -51,10 +51,9 @@ import requests
 from mathruler.grader import extract_boxed_content, grade_answer
 
 # Import parallel rendering utilities
-try:
-    from SelfAgent_svg.code_render.render_code import render_batch_codes
-except ImportError:
-    from code_render.render_code import render_batch_codes
+import sys as _sys
+_sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from code_render.render_code import render_batch_codes
 
 STORAGE_PATH = os.getenv("STORAGE_PATH")
 if STORAGE_PATH is None:

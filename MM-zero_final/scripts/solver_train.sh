@@ -149,7 +149,7 @@ NUM_PROPOSALS_PER_GPU_SOLVER=${NUM_PROPOSALS_PER_GPU_SOLVER:-${NUM_PROPOSALS_PER
 echo ""
 echo "========== PHASE 1/6: PROPOSALS =========="
 echo "[Step 1/6] Generating proposals (${NUM_PROPOSALS_PER_GPU_SOLVER} per GPU)..."
-bash SelfAgent_svg/proposal_generate/proposal_generate.bash $proposer_model_path $NUM_PROPOSALS_PER_GPU_SOLVER $experiment_name
+bash MM-zero_final/proposal_generate/proposal_generate.bash $proposer_model_path $NUM_PROPOSALS_PER_GPU_SOLVER $experiment_name
 
 # Clean GPUs after proposal generation (8 vLLM processes on GPUs 0-7)
 _kill_gpu_processes "Step 1→2"
@@ -158,7 +158,7 @@ _kill_gpu_processes "Step 1→2"
 echo ""
 echo "========== PHASE 2/6: CODE GENERATION =========="
 echo "[Step 2/6] Generating code from proposals..."
-bash SelfAgent_svg/code_generate/code_generate.bash $codegen_model_path $experiment_name
+bash MM-zero_final/code_generate/code_generate.bash $codegen_model_path $experiment_name
 
 # Clean GPUs after code generation (8 vLLM processes on GPUs 0-7)
 _kill_gpu_processes "Step 2→3"
@@ -170,7 +170,7 @@ echo ""
 echo "========== PHASE 3/6: RENDERING =========="
 echo "[Step 3/6] Rendering code to images (progress: done/total — OK count; 70%% cap + 3 min for rest)..."
 RENDER_WORKERS=${RENDER_MAX_WORKERS:-16}
-python SelfAgent_svg/code_render/render_code.py --experiment_name $experiment_name --workers $RENDER_WORKERS --timeout 30
+python MM-zero_final/code_render/render_code.py --experiment_name $experiment_name --workers $RENDER_WORKERS --timeout 30
 
 sleep 5
 
@@ -179,7 +179,7 @@ echo ""
 echo "========== PHASE 4/6: EVALUATION =========="
 echo "[Step 4/6] Evaluating rendered images with Solver (8 workers, 10 rollouts; progress: [0]..[7] chunk X/Y)..."
 EVAL_NUM_SAMPLES=${EVAL_NUM_SAMPLES:-10}
-bash SelfAgent_svg/question_evaluate/evaluate_imagefree.sh $solver_model_path $experiment_name $EVAL_NUM_SAMPLES
+bash MM-zero_final/question_evaluate/evaluate_imagefree.sh $solver_model_path $experiment_name $EVAL_NUM_SAMPLES
 
 # Clean GPUs after evaluation (8 vLLM processes on GPUs 0-7)
 _kill_gpu_processes "Step 4→5"
@@ -188,7 +188,7 @@ _kill_gpu_processes "Step 4→5"
 echo ""
 echo "========== PHASE 5/6: UPLOAD PARQUET =========="
 echo "[Step 5/6] Filtering and saving training data..."
-python SelfAgent_svg/question_evaluate/upload_imagefree.py \
+python MM-zero_final/question_evaluate/upload_imagefree.py \
     --min_easy_consistency 0.5 \
     --min_hard_consistency 0.25 \
     --max_hard_consistency 0.75 \
@@ -234,15 +234,15 @@ echo "========== PHASE 6/6: SOLVER GRPO TRAINING =========="
 GPU_MEM=${GPU_MEM:-40}
 echo "[Step 6/6] Training Solver with GRPO (max_steps=$TRAIN_STEPS, rollout_batch_size=${ROLLOUT_BATCH_SIZE_SOLVER:-config})..."
 python3 -m verl.trainer.main \
-    config=SelfAgent_svg/configs/imagefree_solver_config_${GPU_MEM}gb${MODEL_SIZE:+_${MODEL_SIZE}}.yaml \
+    config=MM-zero_final/configs/imagefree_solver_config_${GPU_MEM}gb${MODEL_SIZE:+_${MODEL_SIZE}}.yaml \
     data.max_response_length=4096 \
     data.train_files=${STORAGE_PATH}/local_parquet/${experiment_name}_train.parquet \
     data.val_files=hiyouga/geometry3k@test \
-    data.format_prompt=./SelfAgent_svg/format_prompt/solver.jinja \
+    data.format_prompt=./MM-zero_final/format_prompt/solver.jinja \
     worker.actor.model.model_path=$solver_model_path \
     worker.actor.micro_batch_size_per_device_for_update=1 \
     worker.actor.micro_batch_size_per_device_for_experience=1 \
-    worker.reward.reward_function=./SelfAgent_svg/reward_function/cot_val_solver.py:compute_score \
+    worker.reward.reward_function=./MM-zero_final/reward_function/cot_val_solver.py:compute_score \
     trainer.total_epochs=10 \
     trainer.max_steps=$TRAIN_STEPS \
     trainer.save_freq=$TRAIN_STEPS \

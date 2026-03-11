@@ -141,7 +141,9 @@ def main():
         torch.cuda.empty_cache()
 
     # Render
-    from SelfAgent_svg.code_render.render_code import render_batch_codes
+    import sys as _sys
+    _sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+    from code_render.render_code import render_batch_codes
 
     print(f"[filter-{args.suffix}] Rendering {len(render_tasks)} code samples ({args.render_workers} workers)...")
     render_results = render_batch_codes(

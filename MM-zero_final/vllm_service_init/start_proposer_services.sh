@@ -9,7 +9,7 @@
 #
 # Ports: CodeGen 70XX, 70XX+1; Solver 60YY..60YY+3. Chosen ports in proposer_service_ports.env.
 #
-# Usage: bash SelfAgent_svg/vllm_service_init/start_proposer_services.sh <codegen_model> <solver_model> [max_model_len]
+# Usage: bash MM-zero_final/vllm_service_init/start_proposer_services.sh <codegen_model> <solver_model> [max_model_len]
 # =============================================================================
 
 codegen_model_path=$1
@@ -73,17 +73,17 @@ fi
 PIDS_FILE="$LOG_DIR/proposer_service_pids.env"
 
 echo "[proposer_services] Starting CodeGen on GPUs 3-4 (ports $CODEGEN_PORT_0, $CODEGEN_PORT_1)..."
-nohup env CUDA_VISIBLE_DEVICES=3 python SelfAgent_svg/vllm_service_init/start_codegen_server.py --port $CODEGEN_PORT_0 --model_path $codegen_model_path $CODEGEN_EXTRA >> "$LOG_DIR/codegen_${CODEGEN_PORT_0}.log" 2>&1 &
+nohup env CUDA_VISIBLE_DEVICES=3 python MM-zero_final/vllm_service_init/start_codegen_server.py --port $CODEGEN_PORT_0 --model_path $codegen_model_path $CODEGEN_EXTRA >> "$LOG_DIR/codegen_${CODEGEN_PORT_0}.log" 2>&1 &
 CODEGEN_PID_0=$!
-nohup env CUDA_VISIBLE_DEVICES=4 python SelfAgent_svg/vllm_service_init/start_codegen_server.py --port $CODEGEN_PORT_1 --model_path $codegen_model_path $CODEGEN_EXTRA >> "$LOG_DIR/codegen_${CODEGEN_PORT_1}.log" 2>&1 &
+nohup env CUDA_VISIBLE_DEVICES=4 python MM-zero_final/vllm_service_init/start_codegen_server.py --port $CODEGEN_PORT_1 --model_path $codegen_model_path $CODEGEN_EXTRA >> "$LOG_DIR/codegen_${CODEGEN_PORT_1}.log" 2>&1 &
 CODEGEN_PID_1=$!
 
 echo "[proposer_services] Starting Solver on GPUs 5-7 (ports $SOLVER_PORT_0, $SOLVER_PORT_1, $SOLVER_PORT_2)..."
-nohup env CUDA_VISIBLE_DEVICES=5 python SelfAgent_svg/vllm_service_init/start_vllm_server.py --port $SOLVER_PORT_0 --model_path $solver_model_path $SOLVER_EXTRA >> "$LOG_DIR/solver_${SOLVER_PORT_0}.log" 2>&1 &
+nohup env CUDA_VISIBLE_DEVICES=5 python MM-zero_final/vllm_service_init/start_vllm_server.py --port $SOLVER_PORT_0 --model_path $solver_model_path $SOLVER_EXTRA >> "$LOG_DIR/solver_${SOLVER_PORT_0}.log" 2>&1 &
 SOLVER_PID_0=$!
-nohup env CUDA_VISIBLE_DEVICES=6 python SelfAgent_svg/vllm_service_init/start_vllm_server.py --port $SOLVER_PORT_1 --model_path $solver_model_path $SOLVER_EXTRA >> "$LOG_DIR/solver_${SOLVER_PORT_1}.log" 2>&1 &
+nohup env CUDA_VISIBLE_DEVICES=6 python MM-zero_final/vllm_service_init/start_vllm_server.py --port $SOLVER_PORT_1 --model_path $solver_model_path $SOLVER_EXTRA >> "$LOG_DIR/solver_${SOLVER_PORT_1}.log" 2>&1 &
 SOLVER_PID_1=$!
-nohup env CUDA_VISIBLE_DEVICES=7 python SelfAgent_svg/vllm_service_init/start_vllm_server.py --port $SOLVER_PORT_2 --model_path $solver_model_path $SOLVER_EXTRA >> "$LOG_DIR/solver_${SOLVER_PORT_2}.log" 2>&1 &
+nohup env CUDA_VISIBLE_DEVICES=7 python MM-zero_final/vllm_service_init/start_vllm_server.py --port $SOLVER_PORT_2 --model_path $solver_model_path $SOLVER_EXTRA >> "$LOG_DIR/solver_${SOLVER_PORT_2}.log" 2>&1 &
 SOLVER_PID_2=$!
 
 {

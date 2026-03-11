@@ -82,7 +82,7 @@ VLLM_MAX_LEN=""
 if [ "$GPU_MEM" = "40" ]; then
     VLLM_MAX_LEN="32768"
 fi
-bash SelfAgent_svg/vllm_service_init/start_proposer_services.sh "$codegen_model_path" "$solver_model_path" "$VLLM_MAX_LEN"
+bash MM-zero_final/vllm_service_init/start_proposer_services.sh "$codegen_model_path" "$solver_model_path" "$VLLM_MAX_LEN"
 echo "CodeGen + Solver services started"
 
 # Load chosen ports (2 CodeGen + 4 Solver)
@@ -128,8 +128,8 @@ EXTRA_ARGS=""
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 echo "Starting Proposer GRPO training (max_steps=$TRAIN_STEPS, rollout.n=${ROLLOUT_N}, rollout_batch_size=${ROLLOUT_BATCH_SIZE:-config})..."
 CUDA_VISIBLE_DEVICES=0,1,2 python3 -m verl.trainer.main \
-    config=SelfAgent_svg/configs/imagefree_proposer_config_${GPU_MEM}gb${MODEL_SIZE:+_${MODEL_SIZE}}${CONFIG_SUFFIX:-}.yaml \
-    data.train_files=./SelfAgent_svg/data/text_seed_prompts.parquet \
+    config=MM-zero_final/configs/imagefree_proposer_config_${GPU_MEM}gb${MODEL_SIZE:+_${MODEL_SIZE}}${CONFIG_SUFFIX:-}.yaml \
+    data.train_files=./MM-zero_final/data/text_seed_prompts.parquet \
     data.val_files=hiyouga/geometry3k@test \
     data.prompt_key=problem \
     data.answer_key=answer \

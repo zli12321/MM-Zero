@@ -15,7 +15,7 @@ data:
   rollout_batch_size: 64
   mini_rollout_batch_size: null
   val_batch_size: 1024
-  format_prompt: ./SelfAgent_svg/format_prompt/proposer.jinja
+  format_prompt: ./MM-zero_final/format_prompt/proposer.jinja
   override_chat_template: null
   shuffle: true
   seed: 1
@@ -94,7 +94,7 @@ worker:
       offload_params: false
 
   reward:
-    reward_function: ./SelfAgent_svg/reward_function/proposer_reward_imgdiv.py:compute_score
+    reward_function: ./MM-zero_final/reward_function/proposer_reward_imgdiv.py:compute_score
 
 trainer:
   total_epochs: 10

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Evaluate rendered images with hard questions using the Solver model.
 # Runs in parallel across 8 GPUs.
-# Usage: bash SelfAgent/question_evaluate/evaluate_imagefree.sh <solver_model_path> <experiment_name>
+# Usage: bash MM-zero_final/question_evaluate/evaluate_imagefree.sh <solver_model_path> <experiment_name>
 #
 # Timeout: After this many seconds from script start, any evaluation worker still running is killed.
 # Set EVALUATE_TIMEOUT_SEC to override (default 3600 = 1 hour).
@@ -15,7 +15,7 @@ echo "[EVALUATE] Starting 8 workers (GPUs 0-7, ${num_samples} rollouts). Timeout
 pids=()
 
 for i in {0..7}; do
-  CUDA_VISIBLE_DEVICES=$i python -u SelfAgent_svg/question_evaluate/evaluate_imagefree.py \
+  CUDA_VISIBLE_DEVICES=$i python -u MM-zero_final/question_evaluate/evaluate_imagefree.py \
       --model $model_name --suffix $i --save_name $save_name --num_samples $num_samples &
   pids[$i]=$!
 done
