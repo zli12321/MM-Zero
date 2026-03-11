@@ -1,7 +1,7 @@
 ### MM-Zero: Multimodal Self-Play for Vision-Language Models 
 
 <p align="center">
-  <a href="https://www.researchgate.net/publication/401388352_Multimodal_Video_Generation_Models_with_Audio_Present_and_Future"><img src="https://img.shields.io/badge/Paper-arXiv-b31b1b.svg" alt="Paper"></a>
+  <a href="http://arxiv.org/abs/2603.09206"><img src="https://img.shields.io/badge/Paper-arXiv-b31b1b.svg" alt="Paper"></a>
 </p>
 
 <p align="center">
@@ -182,10 +182,14 @@ This project is released under the [Apache 2.0 License](LICENSE).
 ## Citation
 
 ```bibtex
-@misc{mm-zero2025,
-  title        = {MM-Zero: Multimodal Self-Play for Vision-Language Models},
-  howpublished = {\url{https://github.com/zli12321/MM-Zero}},
-  year         = {2025}
+@misc{li2026mmzeroselfevolvingmultimodelvision,
+      title={MM-Zero: Self-Evolving Multi-Model Vision Language Models From Zero Data}, 
+      author={Zongxia Li and Hongyang Du and Chengsong Huang and Xiyang Wu and Lantao Yu and Yicheng He and Jing Xie and Xiaomin Wu and Zhichao Liu and Jiarui Zhang and Fuxiao Liu},
+      year={2026},
+      eprint={2603.09206},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2603.09206}, 
 }
 ```
 
