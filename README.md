@@ -53,20 +53,21 @@ bash setup.sh
 ### Hardware Requirements
 
 - **8× GPUs** (80 GB each recommended, e.g., A100/H100)
-  - 2 GPUs for GRPO training + 6 GPUs for vLLM inference (Proposer/CodeGen phases)
+  - 3 GPUs for GRPO training + 5 GPUs for vLLM inference (Proposer phase)
+  - 4 GPUs for GRPO training + 4 GPUs for vLLM inference (Coder phase)
   - All 8 GPUs for Solver GRPO training
 - 40 GB GPUs are supported by setting `GPU_MEM=40`
 
 ## Training
 
-Launch the full self-play pipeline with a single command:
+Launch the full self-evolving pipeline with a single command:
 
 ```bash
 ## Qwen3-VL-8B-Instruct
-bash ./scripts/main_svg.sh
+bash ./MM-zero_final/scripts/main_svg.sh
 
 ## Qwen3-VL-4B-Instruct
-bash ./scripts/main_qwen3vl_4b.sh
+bash ./MM-zero_final/scripts/main_qwen3vl_4b.sh
 ```
 
 This runs the complete iterative loop (Proposer → CodeGen → Solver) for multiple iterations, starting from a base model. Each iteration builds on the previous one's checkpoints.
