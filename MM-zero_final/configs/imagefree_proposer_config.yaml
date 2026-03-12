@@ -12,7 +12,7 @@ data:
   image_dir: null
   video_fps: 2.0
   max_prompt_length: 4096
-  max_response_length: 2048
+  max_response_length: 4096
   # Must be <= number of training samples (seed parquet has ~95 rows); use 64 so at least 1 batch with drop_last
   rollout_batch_size: 64
   mini_rollout_batch_size: null
