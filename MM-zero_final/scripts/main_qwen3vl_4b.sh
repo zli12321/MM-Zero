@@ -38,7 +38,7 @@ else
 fi
 export RENDER_MAX_WORKERS
 
-export STORAGE_PATH="${STORAGE_PATH:-/workspace/selfAgent_Storage_qwen3vl_4b}"
+export STORAGE_PATH="${STORAGE_PATH:-/workspace/dummy_output_qwen3vl_4b}"
 export NUM_PROPOSALS_PER_GPU="${NUM_PROPOSALS_PER_GPU:-450}"
 export RAY_memory_usage_threshold="${RAY_memory_usage_threshold:-0.98}"
 export CODEGEN_HTTP_TIMEOUT="${CODEGEN_HTTP_TIMEOUT:-600}"
