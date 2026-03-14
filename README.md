@@ -192,6 +192,20 @@ This project is released under the [Apache 2.0 License](LICENSE).
       primaryClass={cs.CV},
       url={https://arxiv.org/abs/2603.09206}, 
 }
+
+@article{he2025visplay,
+  title={Visplay: Self-evolving vision-language models from images},
+  author={He, Yicheng and Huang, Chengsong and Li, Zongxia and Huang, Jiaxin and Yang, Yonghui},
+  journal={arXiv preprint arXiv:2511.15661},
+  year={2025}
+}
+
+@article{huang2508self,
+  title={Self-evolving reasoning llm from zero data, 2025},
+  author={Huang, Chengsong and Yu, Wenhao and Wang, Xiaoyang and Zhang, Hongming and Li, Zongxia and Li, Ruosen and Huang, Jiaxin and Mi, Haitao},
+  journal={URL https://arxiv. org/abs/2508.05004}
+}
+
 ```
 
 ## Acknowledgements
