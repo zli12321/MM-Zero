@@ -52,7 +52,7 @@ bash setup.sh
 
 ### Hardware Requirements
 
-- **8× GPUs** (80 GB each recommended, e.g., A100/H100)
+- **8× GPUs** (80 GB each recommended, e.g., A100/H100/Pro A6000)
   - 3 GPUs for GRPO training + 5 GPUs for vLLM inference (Proposer phase)
   - 4 GPUs for GRPO training + 4 GPUs for vLLM inference (Coder phase)
   - All 8 GPUs for Solver GRPO training
