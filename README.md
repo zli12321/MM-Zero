@@ -1,4 +1,4 @@
-### MM-Zero: Multimodal Self-Play for Vision-Language Models 
+### MM-Zero: Multimodal Zero Data Self-Evolution for Vision-Language Models 
 
 <p align="center">
   <a href="http://arxiv.org/abs/2603.09206"><img src="https://img.shields.io/badge/Paper-arXiv-b31b1b.svg" alt="Paper"></a>
